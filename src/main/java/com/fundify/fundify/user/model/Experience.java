@@ -1,9 +1,9 @@
 package com.fundify.fundify.user.model;
 
-public class Experience {
-    private String role;
-    private String company;
-    private String duration;
-}
+public record Experience (
+    String role,
+    String company,
+    String duration
+) {}
 
 
