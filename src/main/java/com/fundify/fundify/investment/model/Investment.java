@@ -1,4 +1,4 @@
-package com.fundify.fundify.common.model;
+package com.fundify.fundify.investment.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;

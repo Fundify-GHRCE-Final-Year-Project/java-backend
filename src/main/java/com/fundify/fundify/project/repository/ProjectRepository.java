@@ -6,11 +6,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.*;
 
 @Repository
 public class ProjectRepository {
@@ -22,12 +18,25 @@ public class ProjectRepository {
             "Pavan Rathod"
     );
 
-    public List<Project> getAllProjects() {
+    public List<Project> get() {
         return projects;
     }
 
-    public Stream<Project> getProjectByID(String id) {
-        return projects.stream().filter((project -> Objects.equals(project.id(), id)));
+    public Optional<Project> find(String id) {
+        return projects.stream().filter((project -> Objects.equals(project.id(), id))).findFirst();
+    }
+
+    public void create(Project project) {
+        projects.add(project);
+    }
+
+    public void update(Project project, String id) {
+        Optional<Project> existingProject = find(id);
+        existingProject.ifPresent(value -> projects.set(projects.indexOf(value), project));
+    }
+
+    public void delete(String id) {
+        projects.removeIf(project -> project.id().equals(id));
     }
 
     @PostConstruct
