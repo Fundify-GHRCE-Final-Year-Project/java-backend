@@ -1,10 +1,10 @@
 package com.fundify.fundify.project.controller;
 
+import com.fundify.fundify.project.exception.ProjectNotFoundException;
 import com.fundify.fundify.project.model.Project;
 import com.fundify.fundify.project.repository.ProjectRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +29,7 @@ public class ProjectController {
     ) {
         Optional<Project> project = projectRepository.find(id);
         if (project.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
         return project;
     }
