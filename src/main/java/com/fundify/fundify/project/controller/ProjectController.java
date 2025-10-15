@@ -3,6 +3,7 @@ package com.fundify.fundify.project.controller;
 import com.fundify.fundify.project.exception.ProjectNotFoundException;
 import com.fundify.fundify.project.model.Project;
 import com.fundify.fundify.project.repository.ProjectRepository;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,7 +54,7 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/")
     void create(
-            @RequestBody Project project
+            @Valid @RequestBody Project project
     ) {
         projectRepository.create(project);
     }
@@ -62,7 +63,7 @@ public class ProjectController {
     @PutMapping("/{id}")
     void update(
             @PathVariable String id,
-            @RequestBody Project project
+            @Valid @RequestBody Project project
     ) {
         projectRepository.update(project, id);
     }

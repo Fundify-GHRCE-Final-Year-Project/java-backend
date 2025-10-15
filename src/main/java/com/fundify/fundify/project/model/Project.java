@@ -1,6 +1,7 @@
 package com.fundify.fundify.project.model;
 
 import com.fundify.fundify.common.enums.Category;
+import jakarta.validation.constraints.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,18 +13,34 @@ import java.util.List;
 
 @Document("projects")
 public record Project (
-        @Id String id,
+        @Id
+        String id,
+        @NotEmpty
         String title,
+        @NotEmpty
         String description,
+        @NotEmpty
         List<String> members,
+        @NotNull
         Category category,
-        @Indexed String owner,
-        @Indexed int index,
+        @NotEmpty
+        @Indexed
+        String owner,
+        @PositiveOrZero
+        @Indexed
+        int index,
+        @PositiveOrZero
         double goal,
+        @PositiveOrZero
         double milestones,
+        @PositiveOrZero
         double funded,
+        @PositiveOrZero
         double released,
+        @Positive
         int timestamp,
-        @CreatedDate Instant createdAt,
-        @LastModifiedDate Instant updatedAt
+        @CreatedDate
+        Instant createdAt,
+        @LastModifiedDate
+        Instant updatedAt
 ) {}
