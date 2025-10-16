@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 @Repository
 public class InvestmentRepository {
-    private List<Investment> investments = new ArrayList<>();
+    private final List<Investment> investments = new ArrayList<>();
 
     public List<Investment> get() {
         return investments;

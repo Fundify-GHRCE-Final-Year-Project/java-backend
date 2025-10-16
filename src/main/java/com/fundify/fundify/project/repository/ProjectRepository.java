@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 
 @Repository
 public class ProjectRepository {
-    private List<Project> projects = new ArrayList<>();
-    private List<String> members = Arrays.asList(
+    private final List<Project> projects = new ArrayList<>();
+    private final List<String> members = Arrays.asList(
             "Arav Bhivgade",
             "Kartik Turak",
             "Piyush Churhe",
