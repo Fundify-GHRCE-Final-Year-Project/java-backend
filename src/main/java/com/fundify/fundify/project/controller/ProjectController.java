@@ -24,23 +24,27 @@ public class ProjectController {
         return projectRepository.get();
     }
 
-    @GetMapping("/{id}")
-    Optional<Project> find(
-            @PathVariable String id
+    @GetMapping("/{owner}")
+    List<Project> get(
+            @PathVariable String owner
     ) {
-        Optional<Project> project = projectRepository.find(id);
+        List<Project> projects = projectRepository.get(owner);
+        if (projects.isEmpty()) {
+            throw new ProjectNotFoundException();
+        }
+        return projects;
+    }
+
+    @GetMapping("/{owner}/{index}")
+    Optional<Project> find(
+            @PathVariable String owner,
+            @PathVariable int index
+    ) {
+        Optional<Project> project = projectRepository.find(owner, index);
         if (project.isEmpty()) {
             throw new ProjectNotFoundException();
         }
         return project;
-    }
-
-    @GetMapping("/{owner}/{index}")
-    String find(
-            @PathVariable String owner,
-            @PathVariable int index
-    ) {
-        return "Hello Project!";
     }
 
     @GetMapping("/filter/{status}/{limit}")
@@ -60,19 +64,21 @@ public class ProjectController {
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PutMapping("/{id}")
+    @PutMapping("/{owner}/{index}")
     void update(
-            @PathVariable String id,
+            @PathVariable String owner,
+            @PathVariable int index,
             @Valid @RequestBody Project project
     ) {
-        projectRepository.update(project, id);
+        projectRepository.update(project, owner, index);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{owner}/{index}")
     void delete(
-            @PathVariable String id
+            @PathVariable String owner,
+            @PathVariable int index
     ) {
-        projectRepository.delete(id);
+        projectRepository.delete(owner, index);
     }
 }

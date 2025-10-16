@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class ProjectRepository {
@@ -22,21 +23,25 @@ public class ProjectRepository {
         return projects;
     }
 
-    public Optional<Project> find(String id) {
-        return projects.stream().filter((project -> Objects.equals(project.id(), id))).findFirst();
+    public List<Project> get(String owner) {
+        return projects.stream().filter((project -> Objects.equals(project.owner(), owner))).collect(Collectors.toList());
+    }
+
+    public Optional<Project> find(String owner, int index) {
+        return projects.stream().filter((project -> project.owner().equals(owner) && project.index() == index)).findFirst();
     }
 
     public void create(Project project) {
         projects.add(project);
     }
 
-    public void update(Project project, String id) {
-        Optional<Project> existingProject = find(id);
+    public void update(Project project, String owner, int index) {
+        Optional<Project> existingProject = find(owner, index);
         existingProject.ifPresent(value -> projects.set(projects.indexOf(value), project));
     }
 
-    public void delete(String id) {
-        projects.removeIf(project -> project.id().equals(id));
+    public void delete(String owner, int index) {
+        projects.removeIf(project -> project.owner().equals(owner) && project.index() == index);
     }
 
     @PostConstruct
@@ -65,7 +70,7 @@ public class ProjectRepository {
                 members,
                 Category.Environment,
                 "kartik.eth",
-                2,
+                1,
                 500000,
                 10,
                 100000,
@@ -82,7 +87,7 @@ public class ProjectRepository {
                 members,
                 Category.Finance,
                 "pavan.eth",
-                3,
+                1,
                 200000,
                 8,
                 150000,
