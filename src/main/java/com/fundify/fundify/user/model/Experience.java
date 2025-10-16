@@ -1,9 +1,14 @@
 package com.fundify.fundify.user.model;
 
+import jakarta.validation.constraints.NotEmpty;
+
 public record Experience (
-    String role,
-    String company,
-    String duration
+        @NotEmpty
+        String role,
+        @NotEmpty
+        String company,
+        @NotEmpty
+        String duration
 ) {}
 
 
