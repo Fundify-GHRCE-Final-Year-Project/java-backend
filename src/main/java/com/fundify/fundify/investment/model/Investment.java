@@ -3,36 +3,25 @@ package com.fundify.fundify.investment.model;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import java.time.Instant;
 
-@Document("investments")
 public record Investment (
-    @Id
+    @NotEmpty
     String id,
     @NotEmpty
-    @Indexed
     String funder,
+    @NotEmpty
     @PositiveOrZero
-    @Indexed
     int investmentIndex,
     @NotEmpty
-    @Indexed
     String projectOwner,
+    @NotEmpty
     @PositiveOrZero
-    @Indexed
     int projectIndex,
+    @NotEmpty
     @Positive
     double amount,
+    @NotEmpty
     @Positive
-    int timestamp,
-    @CreatedDate
-    Instant createdAt,
-    @LastModifiedDate
-    Instant updatedAt
+    int timestamp
 ) {}
 

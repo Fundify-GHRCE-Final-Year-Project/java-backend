@@ -6,7 +6,6 @@ import com.fundify.fundify.user.model.User;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
 import java.util.*;
 
 @Repository
@@ -52,9 +51,7 @@ public class UserRepository {
                 "https://www.linkedin.com/in/arav",
                 "xArav",
                 "https://github.com/arav",
-                List.of(Category.Technology, Category.Education),
-                Instant.now(),
-                Instant.now()
+                List.of(Category.Technology, Category.Education)
         ));
 
         users.add(new User(
@@ -73,9 +70,7 @@ public class UserRepository {
                 "https://www.linkedin.com/in/kartik",
                 "xKartik",
                 "https://github.com/kartik",
-                List.of(Category.Finance, Category.Environment),
-                Instant.now(),
-                Instant.now()
+                List.of(Category.Finance, Category.Environment)
         ));
 
         users.add(new User(
@@ -94,9 +89,7 @@ public class UserRepository {
                 "https://www.linkedin.com/in/pavan",
                 "xPavan",
                 "https://github.com/pavan",
-                List.of(Category.Education, Category.Technology),
-                Instant.now(),
-                Instant.now()
+                List.of(Category.Education, Category.Technology)
         ));
     }
 }

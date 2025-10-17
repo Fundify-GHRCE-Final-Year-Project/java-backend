@@ -2,18 +2,11 @@ package com.fundify.fundify.project.model;
 
 import com.fundify.fundify.common.enums.Category;
 import jakarta.validation.constraints.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
-import java.time.Instant;
 import java.util.List;
 
-@Document("projects")
 public record Project (
-        @Id
+        @NotEmpty
         String id,
         @NotEmpty
         String title,
@@ -24,23 +17,23 @@ public record Project (
         @NotNull
         Category category,
         @NotEmpty
-        @Indexed
         String owner,
+        @NotEmpty
         @PositiveOrZero
-        @Indexed
         int index,
-        @PositiveOrZero
+        @NotEmpty
+        @Positive
         double goal,
-        @PositiveOrZero
+        @NotEmpty
+        @Positive
         double milestones,
+        @NotEmpty
         @PositiveOrZero
         double funded,
+        @NotEmpty
         @PositiveOrZero
         double released,
+        @NotEmpty
         @Positive
-        int timestamp,
-        @CreatedDate
-        Instant createdAt,
-        @LastModifiedDate
-        Instant updatedAt
+        int timestamp
 ) {}

@@ -1,13 +1,12 @@
 package com.fundify.fundify.project.repository;
 
 import com.fundify.fundify.common.enums.Category;
+import com.fundify.fundify.common.enums.ProjectStatus;
 import com.fundify.fundify.project.model.Project;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 public class ProjectRepository {
@@ -24,11 +23,30 @@ public class ProjectRepository {
     }
 
     public List<Project> get(String owner) {
-        return projects.stream().filter((project -> Objects.equals(project.owner(), owner))).collect(Collectors.toList());
+        return projects.stream().filter((project -> Objects.equals(project.owner(), owner))).toList();
     }
 
     public Optional<Project> find(String owner, int index) {
         return projects.stream().filter((project -> project.owner().equals(owner) && project.index() == index)).findFirst();
+    }
+
+    public List<Project> filter(ProjectStatus status, int limit) {
+        List<Project> filteredProjects = new ArrayList<>();
+        switch (status) {
+            case Active -> {
+                filteredProjects = projects.stream().filter(project -> project.goal() - project.funded() != 0).limit(limit).toList();
+                break;
+            }
+            case Ended -> {
+                filteredProjects = projects.stream().filter(project -> project.goal() - project.funded() == 0).limit(limit).toList();
+                break;
+            }
+            case All -> {
+                filteredProjects = projects.stream().limit(limit).toList();
+                break;
+            }
+        }
+        return filteredProjects;
     }
 
     public void create(Project project) {
@@ -58,9 +76,7 @@ public class ProjectRepository {
                 5,
                 25000,
                 5000,
-                134387,
-                Instant.now(),
-                Instant.now()
+                134387
         ));
 
         projects.add(new Project(
@@ -75,9 +91,7 @@ public class ProjectRepository {
                 10,
                 100000,
                 20000,
-                134387,
-                Instant.now(),
-                Instant.now()
+                134387
         ));
 
         projects.add(new Project(
@@ -92,9 +106,7 @@ public class ProjectRepository {
                 8,
                 150000,
                 120000,
-                134387,
-                Instant.now(),
-                Instant.now()
+                134387
         ));
     }
 }

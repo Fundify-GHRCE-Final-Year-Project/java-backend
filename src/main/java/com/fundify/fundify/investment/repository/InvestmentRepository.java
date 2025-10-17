@@ -4,7 +4,6 @@ import com.fundify.fundify.investment.model.Investment;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,9 +49,7 @@ public class InvestmentRepository {
                 "arav.eth",
                 1,
                 1.0,
-                154387,
-                Instant.now(),
-                Instant.now()
+                154387
         ));
         investments.add(new Investment(
                 "2",
@@ -61,9 +58,7 @@ public class InvestmentRepository {
                 "arav.eth",
                 1,
                 1.0,
-                154387,
-                Instant.now(),
-                Instant.now()
+                154387
         ));
         investments.add(new Investment(
                 "3",
@@ -72,9 +67,7 @@ public class InvestmentRepository {
                 "arav.eth",
                 1,
                 1.0,
-                154387,
-                Instant.now(),
-                Instant.now()
+                154387
         ));
         investments.add(new Investment(
                 "4",
@@ -83,9 +76,7 @@ public class InvestmentRepository {
                 "kartik.eth",
                 1,
                 1.0,
-                154387,
-                Instant.now(),
-                Instant.now()
+                154387
         ));
         investments.add(new Investment(
                 "5",
@@ -94,9 +85,7 @@ public class InvestmentRepository {
                 "kartik.eth",
                 1,
                 1.0,
-                154387,
-                Instant.now(),
-                Instant.now()
+                154387
         ));
         investments.add(new Investment(
                 "6",
@@ -105,9 +94,7 @@ public class InvestmentRepository {
                 "kartik.eth",
                 1,
                 1.0,
-                154387,
-                Instant.now(),
-                Instant.now()
+                154387
         ));
         investments.add(new Investment(
                 "7",
@@ -116,9 +103,7 @@ public class InvestmentRepository {
                 "pavan.eth",
                 1,
                 1.0,
-                154387,
-                Instant.now(),
-                Instant.now()
+                154387
         ));
         investments.add(new Investment(
                 "8",
@@ -127,9 +112,7 @@ public class InvestmentRepository {
                 "pavan.eth",
                 1,
                 1.0,
-                154387,
-                Instant.now(),
-                Instant.now()
+                154387
         ));
         investments.add(new Investment(
                 "9",
@@ -138,9 +121,7 @@ public class InvestmentRepository {
                 "pavan.eth",
                 1,
                 1.0,
-                154387,
-                Instant.now(),
-                Instant.now()
+                154387
         ));
     }
 }

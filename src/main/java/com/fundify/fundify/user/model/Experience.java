@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotEmpty;
 
 public record Experience (
         @NotEmpty
-        String role,
+        String job,
         @NotEmpty
         String company,
         @NotEmpty

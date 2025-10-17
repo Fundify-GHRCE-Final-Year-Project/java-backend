@@ -1,5 +1,6 @@
 package com.fundify.fundify.project.controller;
 
+import com.fundify.fundify.common.enums.ProjectStatus;
 import com.fundify.fundify.project.exception.ProjectNotFoundException;
 import com.fundify.fundify.project.model.Project;
 import com.fundify.fundify.project.repository.ProjectRepository;
@@ -48,11 +49,15 @@ public class ProjectController {
     }
 
     @GetMapping("/filter/{status}/{limit}")
-    String filter(
-            @PathVariable String status,
+    List<Project> filter(
+            @PathVariable ProjectStatus status,
             @PathVariable int limit
     ) {
-        return "Hello Project!";
+        List<Project> filteredProjects = projectRepository.filter(status, limit);
+        if (filteredProjects.isEmpty()) {
+            throw new ProjectNotFoundException();
+        }
+        return filteredProjects;
     }
 
     @ResponseStatus(HttpStatus.CREATED)

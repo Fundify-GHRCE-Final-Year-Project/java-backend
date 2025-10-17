@@ -2,28 +2,20 @@ package com.fundify.fundify.user.model;
 
 import com.fundify.fundify.common.enums.Category;
 import jakarta.validation.constraints.NotEmpty;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import java.time.Instant;
-import java.util.ArrayList;
+
 import java.util.List;
 
-@Document("users")
 public record User (
-    @Id
+    @NotEmpty
     String id,
     @NotEmpty
-    @Indexed(unique = true)
     String wallet,
     @NotEmpty
-    String name,
+    String username,
     @NotEmpty
     String country,
     @NotEmpty
-    String role,
+    String job,
     String phone,
     @NotEmpty
     String address,
@@ -34,9 +26,5 @@ public record User (
     String linkedin,
     String x,
     String github,
-    List<Category> interests,
-    @CreatedDate
-    Instant createdAt,
-    @LastModifiedDate
-    Instant updatedAt
+    List<Category> interests
 ) {}
