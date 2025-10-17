@@ -1,95 +1,164 @@
 package com.fundify.fundify.user.repository;
 
-import com.fundify.fundify.common.enums.Category;
-import com.fundify.fundify.user.model.Experience;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fundify.fundify.user.model.User;
-import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class UserRepository {
-    private final List<User> users = new ArrayList<>();
+    private static final Logger log = LoggerFactory.getLogger(UserRepository.class);
+    private final JdbcClient jdbcClient;
+    private final ObjectMapper objectMapper;
+
+    public UserRepository(JdbcClient jdbcClient, ObjectMapper objectMapper) {
+        this.jdbcClient = jdbcClient;
+        this.objectMapper = objectMapper;
+    }
 
     public List<User> get() {
-        return users;
+        return jdbcClient.sql("SELECT JSON_OBJECT(\n" +
+                        "  'id' VALUE u.id,\n" +
+                        "  'wallet' VALUE u.wallet,\n" +
+                        "  'username' VALUE u.username,\n" +
+                        "  'country' VALUE u.country,\n" +
+                        "  'job' VALUE u.job,\n" +
+                        "  'phone' VALUE u.phone,\n" +
+                        "  'address' VALUE u.address,\n" +
+                        "  'linkedin' VALUE u.linkedin,\n" +
+                        "  'x' VALUE u.x,\n" +
+                        "  'github' VALUE u.github,\n" +
+                        "  'skills' VALUE COALESCE(s.skills, JSON_ARRAY()),\n" +
+                        "  'interests' VALUE COALESCE(i.interests, JSON_ARRAY()),\n" +
+                        "  'experiences' VALUE COALESCE(e.experiences, JSON_ARRAY())\n" +
+                        ") AS users_json\n" +
+                        "FROM USERS u\n" +
+                        "LEFT JOIN (\n" +
+                        "    SELECT s.id, JSON_ARRAYAGG(DISTINCT s.skill) AS skills\n" +
+                        "    FROM SKILLS s\n" +
+                        "    GROUP BY s.id\n" +
+                        ") s ON u.id = s.id\n" +
+                        "LEFT JOIN (\n" +
+                        "    SELECT i.id, JSON_ARRAYAGG(DISTINCT i.interest) AS interests\n" +
+                        "    FROM INTERESTS i\n" +
+                        "    GROUP BY i.id\n" +
+                        ") i ON u.id = i.id\n" +
+                        "LEFT JOIN (\n" +
+                        "    SELECT e.id, JSON_ARRAYAGG(\n" +
+                        "        JSON_OBJECT(\n" +
+                        "            'job' VALUE e.job,\n" +
+                        "            'company' VALUE e.company,\n" +
+                        "            'duration' VALUE e.duration\n" +
+                        "        )\n" +
+                        "    ) AS experiences\n" +
+                        "    FROM EXPERIENCES e\n" +
+                        "    GROUP BY e.id\n" +
+                        ") e ON u.id = e.id\n" +
+                        "GROUP BY u.id;\n")
+                .query((rs, rowNum) -> {
+                    String json = rs.getString("users_json");
+                    try {
+                        return objectMapper.readValue(json, User.class);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error parsing JSON: " + json, e);
+                    }
+                })
+                .list();
     }
 
     public Optional<User> get(String wallet) {
-        return users.stream().filter(user -> user.wallet().equals(wallet)).findFirst();
+        return jdbcClient.sql("SELECT JSON_OBJECT(\n" +
+                        "  'id', u.id,\n" +
+                        "  'wallet', u.wallet,\n" +
+                        "  'username', u.username,\n" +
+                        "  'country', u.country,\n" +
+                        "  'job', u.job,\n" +
+                        "  'phone', u.phone,\n" +
+                        "  'address', u.address,\n" +
+                        "  'linkedin', u.linkedin,\n" +
+                        "  'x', u.x,\n" +
+                        "  'github', u.github,\n" +
+                        "  'skills', COALESCE(s.skills, JSON_ARRAY()),\n" +
+                        "  'interests', COALESCE(i.interests, JSON_ARRAY()),\n" +
+                        "  'experiences', COALESCE(e.experiences, JSON_ARRAY())\n" +
+                        ") AS users_json\n" +
+                        "FROM USERS u\n" +
+                        "LEFT JOIN (\n" +
+                        "    SELECT s.id, JSON_ARRAYAGG(DISTINCT s.skill) AS skills\n" +
+                        "    FROM SKILLS s\n" +
+                        "    GROUP BY s.id\n" +
+                        ") s ON u.id = s.id\n" +
+                        "LEFT JOIN (\n" +
+                        "    SELECT i.id, JSON_ARRAYAGG(DISTINCT i.interest) AS interests\n" +
+                        "    FROM INTERESTS i\n" +
+                        "    GROUP BY i.id\n" +
+                        ") i ON u.id = i.id\n" +
+                        "LEFT JOIN (\n" +
+                        "    SELECT e.id, JSON_ARRAYAGG(\n" +
+                        "        JSON_OBJECT(\n" +
+                        "            'job' VALUE e.job,\n" +
+                        "            'company' VALUE e.company,\n" +
+                        "            'duration' VALUE e.duration\n" +
+                        "        )\n" +
+                        "    ) AS experiences\n" +
+                        "    FROM EXPERIENCES e\n" +
+                        "    GROUP BY e.id\n" +
+                        ") e ON u.id = e.id\n" +
+                        "WHERE u.wallet = :wallet \n")
+                .param("wallet", wallet)
+                .query(User.class)
+                .optional();
     }
 
     public void create(User user) {
-        users.add(user);
+        jdbcClient.sql("INSERT INTO USERS (id, wallet, username, country, job, phone, address, linkedin, x, github)" +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?)")
+                .params(List.of(user.id(), user.wallet(), user.username(),
+                        user.country(), user.job(), user.phone(),
+                        user.address(), user.linkedin(), user.x(), user.github())).update();
+        for (int i = 0; i < user.skills().size(); i++) {
+            jdbcClient.sql("INSERT INTO SKILLS (id, skill) VALUES (?, ?)")
+                    .params(List.of(user.id(), user.skills().get(i))).update();
+        }
+        for (int i = 0; i < user.experiences().size(); i++) {
+            jdbcClient.sql("INSERT INTO EXPERIENCES (id, job, company, duration) VALUES (?, ?, ?, ?)")
+                    .params(List.of(user.id(), user.experiences().get(i).job(), user.experiences().get(i).company(), user.experiences().get(i).duration())).update();
+        }
+        for (int i = 0; i < user.interests().size(); i++) {
+            jdbcClient.sql("INSERT INTO INTERESTS (id, interest) VALUES (?, ?)")
+                    .params(List.of(user.id(), user.interests().get(i).toString())).update();
+        }
     }
 
     public void update(User user, String wallet) {
-        Optional<User> existingInvestment = get(wallet);
-        existingInvestment.ifPresent(value -> users.set(users.indexOf(value), user));
+        jdbcClient.sql("UPDATE USERS SET id = ?, wallet = ?, username = ?, country = ?, " +
+                        "job = ?, phone = ?, address = ?, linkedin = ?, x = ?, github = ? WHERE wallet = ?")
+                .params(List.of(user.id(), user.wallet(), user.username(),
+                        user.country(), user.job(), user.phone(),
+                        user.address(), user.linkedin(), user.x(), user.github(), wallet)).update();
+        for (int i = 0; i < user.skills().size(); i++) {
+            jdbcClient.sql("UPDATE SKILLS SET id = ?, skill = ? WHERE id = ?")
+                    .params(List.of(user.id(), user.skills().get(i), user.id())).update();
+        }
+        for (int i = 0; i < user.experiences().size(); i++) {
+            jdbcClient.sql("UPDATE EXPERIENCES SET id = ?, job = ?, company = ?, duration = ? WHERE id = ?")
+                    .params(List.of(user.id(), user.experiences().get(i).job(),
+                            user.experiences().get(i).company(), user.experiences().get(i).duration(),
+                            user.id())).update();
+        }
+        for (int i = 0; i < user.interests().size(); i++) {
+            jdbcClient.sql("UPDATE INTERESTS SET id = ?, interest = ? WHERE id = ?")
+                    .params(List.of(user.id(), user.interests().get(i).toString(), user.id())).update();
+        }
     }
 
     public void delete(String wallet) {
-        users.removeIf(user -> user.wallet().equals(wallet));
-    }
-
-    @PostConstruct
-    private void init() {
-        users.add(new User(
-                "1",
-                "0x1",                   // wallet
-                "Arav",
-                "India",
-                "Software Engineer",
-                "+91-98765-43210",
-                "Nagpur",
-                List.of("Java", "Blockchain", "TeX"),
-                List.of(
-                        new Experience("Software Engineer", "Innotech", "2 years"),
-                        new Experience("Blockchain Dev", "ChainLabs", "1 year")
-                ),
-                "https://www.linkedin.com/in/arav",
-                "xArav",
-                "https://github.com/arav",
-                List.of(Category.Technology, Category.Education)
-        ));
-
-        users.add(new User(
-                "2",
-                "0x2",
-                "Kartik",
-                "India",
-                "Software Engineer",
-                "+91-98765-43210",
-                "Flat 12A, Delhi",
-                List.of("Python", "DeFi", "Data Science"),
-                List.of(
-                        new Experience("Data Analyst", "DataCorp", "3 years"),
-                        new Experience("DeFi Researcher", "BlockFunder", "2 years")
-                ),
-                "https://www.linkedin.com/in/kartik",
-                "xKartik",
-                "https://github.com/kartik",
-                List.of(Category.Finance, Category.Environment)
-        ));
-
-        users.add(new User(
-                "3",
-                "0x3",
-                "Pavan",
-                "India",
-                "Software Engineer",
-                "+91-98765-43210",
-                "Nagpur",
-                List.of("UX Design", "Front End", "Web3"),
-                List.of(
-                        new Experience("UI/UX Designer", "DesignHive", "2 years"),
-                        new Experience("Frontend Developer", "Web3Start", "1 year")
-                ),
-                "https://www.linkedin.com/in/pavan",
-                "xPavan",
-                "https://github.com/pavan",
-                List.of(Category.Education, Category.Technology)
-        ));
+        jdbcClient.sql("DELETE FROM USERS WHERE wallet = ?")
+                .param(wallet).update();
     }
 }
