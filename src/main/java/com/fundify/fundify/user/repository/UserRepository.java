@@ -73,19 +73,19 @@ public class UserRepository {
 
     public Optional<User> get(String wallet) {
         return jdbcClient.sql("SELECT JSON_OBJECT(\n" +
-                        "  'id', u.id,\n" +
-                        "  'wallet', u.wallet,\n" +
-                        "  'username', u.username,\n" +
-                        "  'country', u.country,\n" +
-                        "  'job', u.job,\n" +
-                        "  'phone', u.phone,\n" +
-                        "  'address', u.address,\n" +
-                        "  'linkedin', u.linkedin,\n" +
-                        "  'x', u.x,\n" +
-                        "  'github', u.github,\n" +
-                        "  'skills', COALESCE(s.skills, JSON_ARRAY()),\n" +
-                        "  'interests', COALESCE(i.interests, JSON_ARRAY()),\n" +
-                        "  'experiences', COALESCE(e.experiences, JSON_ARRAY())\n" +
+                        "  'id' VALUE u.id,\n" +
+                        "  'wallet' VALUE u.wallet,\n" +
+                        "  'username' VALUE u.username,\n" +
+                        "  'country' VALUE u.country,\n" +
+                        "  'job' VALUE u.job,\n" +
+                        "  'phone' VALUE u.phone,\n" +
+                        "  'address' VALUE u.address,\n" +
+                        "  'linkedin' VALUE u.linkedin,\n" +
+                        "  'x' VALUE u.x,\n" +
+                        "  'github' VALUE u.github,\n" +
+                        "  'skills' VALUE COALESCE(s.skills, JSON_ARRAY()),\n" +
+                        "  'interests' VALUE COALESCE(i.interests, JSON_ARRAY()),\n" +
+                        "  'experiences' VALUE COALESCE(e.experiences, JSON_ARRAY())\n" +
                         ") AS users_json\n" +
                         "FROM USERS u\n" +
                         "LEFT JOIN (\n" +
@@ -109,9 +109,16 @@ public class UserRepository {
                         "    FROM EXPERIENCES e\n" +
                         "    GROUP BY e.id\n" +
                         ") e ON u.id = e.id\n" +
-                        "WHERE u.wallet = :wallet \n")
+                        "WHERE u.wallet = :wallet;")
                 .param("wallet", wallet)
-                .query(User.class)
+                .query((rs, rowNum) -> {
+                    String json = rs.getString("users_json");
+                    try {
+                        return objectMapper.readValue(json, User.class);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error parsing JSON: " + json, e);
+                    }
+                })
                 .optional();
     }
 
