@@ -1,13 +1,13 @@
 -- ---------------------------
 -- Users (9 rows)
 -- ---------------------------
-INSERT INTO USERS (id, wallet, username, country, job, phone, address, linkedin, x, github)
+INSERT INTO "user" (id, wallet, username, country, job, phone, address, linkedin, x, github, version)
 VALUES ('u1', '0xAAA1', 'alice', 'India', 'Developer', '+91-9000010001', 'Mumbai, India',
-        'https://linkedin.com/in/alice', '@alice', 'alice-gh'),
+        'https://linkedin.com/in/alice', '@alice', 'alice-gh', 1),
        ('u2', '0xAAA2', 'bob', 'USA', 'Researcher', '+1-202-555-0102', 'Washington, USA', 'https://linkedin.com/in/bob',
-        '@bob', 'bob-gh'),
+        '@bob', 'bob-gh', 1),
        ('u3', '0xAAA3', 'carol', 'UK', 'Designer', '+44-7700-900003', 'London, UK', 'https://linkedin.com/in/carol',
-        '@carol', 'carol-gh');
+        '@carol', 'carol-gh', 1);
 
 -- ---------------------------
 -- Skill (9 rows) — each row links to a user id

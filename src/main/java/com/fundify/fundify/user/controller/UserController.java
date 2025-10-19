@@ -2,7 +2,7 @@ package com.fundify.fundify.user.controller;
 
 import com.fundify.fundify.user.exception.UserNotFoundException;
 import com.fundify.fundify.user.model.User;
-import com.fundify.fundify.user.repository.UserRepository;
+import com.fundify.fundify.user.repository.NewUserRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -13,22 +13,22 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
-    private final UserRepository userRepository;
+    private final NewUserRepository userRepository;
 
-    public UserController(UserRepository userRepository) {
+    public UserController(NewUserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @GetMapping("/")
     List<User> get() {
-        return userRepository.get();
+        return userRepository.findAll();
     }
 
     @GetMapping("/{wallet}")
     Optional<User> get(
             @PathVariable String wallet
     ) {
-        Optional<User> existingUser = userRepository.get(wallet);
+        Optional<User> existingUser = userRepository.findById(wallet);
         if (existingUser.isEmpty()) {
             throw new UserNotFoundException();
         }
@@ -40,16 +40,15 @@ public class UserController {
     void create(
             @Valid @RequestBody User user
     ) {
-        userRepository.create(user);
+        userRepository.save(user);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PutMapping("/{wallet}")
+    @PutMapping("/")
     void update(
-            @PathVariable String wallet,
             @Valid @RequestBody User user
     ) {
-        userRepository.update(user, wallet);
+        userRepository.save(user);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -57,7 +56,7 @@ public class UserController {
     void delete(
             @PathVariable String wallet
     ) {
-        userRepository.delete(wallet);
+        userRepository.deleteById(wallet);
     }
 }
 

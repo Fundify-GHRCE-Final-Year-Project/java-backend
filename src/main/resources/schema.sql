@@ -18,7 +18,7 @@ CREATE TYPE Category AS ENUM (
     'Science'
     );
 
-CREATE TABLE IF NOT EXISTS Users
+CREATE TABLE IF NOT EXISTS "user"
 (
     id       VARCHAR(255) PRIMARY KEY,
     wallet   VARCHAR(255) NOT NULL UNIQUE,
@@ -29,14 +29,15 @@ CREATE TABLE IF NOT EXISTS Users
     address  VARCHAR(255) NOT NULL,
     linkedin VARCHAR(255) NOT NULL,
     x        VARCHAR(255),
-    github   VARCHAR(255)
+    github   VARCHAR(255),
+    version  INT
 );
 
 CREATE TABLE IF NOT EXISTS Skills
 (
     id    VARCHAR(255) NOT NULL,
     skill VARCHAR(255) NOT NULL,
-    FOREIGN KEY (id) REFERENCES Users (id) ON DELETE CASCADE
+    FOREIGN KEY (id) REFERENCES "user" (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Experiences
@@ -45,14 +46,14 @@ CREATE TABLE IF NOT EXISTS Experiences
     job      VARCHAR(255) NOT NULL,
     company  VARCHAR(255) NOT NULL,
     duration VARCHAR(255) NOT NULL,
-    FOREIGN KEY (id) REFERENCES Users (id) ON DELETE CASCADE
+    FOREIGN KEY (id) REFERENCES "user" (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Interests
 (
     id       VARCHAR(255) NOT NULL,
     interest Category     NOT NULL,
-    FOREIGN KEY (id) REFERENCES Users (id) ON DELETE CASCADE
+    FOREIGN KEY (id) REFERENCES "user" (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Projects
@@ -68,7 +69,7 @@ CREATE TABLE IF NOT EXISTS Projects
     funded        DECIMAL(14, 2) CHECK (funded >= 0)                        NOT NULL,
     released      DECIMAL(14, 2) CHECK (released >= 0)                      NOT NULL,
     eth_timestamp INT                                                       NOT NULL CHECK (eth_timestamp > 0) NOT NULL,
-    FOREIGN KEY (owner) REFERENCES Users (wallet) ON DELETE CASCADE
+    FOREIGN KEY (owner) REFERENCES "user" (wallet) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Members
@@ -89,6 +90,6 @@ CREATE TABLE IF NOT EXISTS Investments
     amount           DECIMAL(14, 2) NOT NULL CHECK (amount > 0),
     eth_timestamp    INT            NOT NULL CHECK (eth_timestamp > 0),
     FOREIGN KEY (project_id) REFERENCES Projects (id) ON DELETE CASCADE,
-    FOREIGN KEY (funder) REFERENCES Users (wallet) ON DELETE CASCADE,
-    FOREIGN KEY (project_owner) REFERENCES Users (wallet) ON DELETE CASCADE
+    FOREIGN KEY (funder) REFERENCES "user" (wallet) ON DELETE CASCADE,
+    FOREIGN KEY (project_owner) REFERENCES "user" (wallet) ON DELETE CASCADE
 );
